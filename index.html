@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우주의 신비 탐험</title>
+    <link rel="stylesheet" href="main.css">
+</head>
+<body>
+    
+    <header class="main-header">
+        <h1>안중고등학교</h1>
+        <h4>영어 과제물</h4>
+        <h4>박승현</h4>
+
+        <h1>425797981376593<span data-bind="totalExpansion">0</span></h1>
+        
+        <nav>
+            <hr>
+            <ul>
+                <li><a href="#section1">오로라</a></li>
+                <li><a href="#section2">행성들</a></li>
+                <li><a href="#section3">은하계</a></li>
+            </ul>
+            <hr>
+        </nav>
+    </header>
+    
+    <!-- Three.js 캔버스와 텍스트 오버레이를 위한 래퍼 (Relative Position 기준) -->
+    <div class="canvas-wrapper">
+        <canvas id="canvas"></canvas>
+        <div class="sameSizeWithCanvas">
+            <!-- 요청에 따라 asdffsda 텍스트를 달 모델 정중앙에 배치합니다. -->
+            <h1 class="centerText upText">우주의 신비 탐험</h1>
+        </div>
+    </div>
+
+    
+    
+<script type="importmap">
+    
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.141.0/build/three.module.js",
+            "GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.141.0/examples/jsm/loaders/GLTFLoader.js"
+        }
+    }
+</script>
+
+<script type="module">
+    import { GLTFLoader } from 'GLTFLoader'; 
+    import * as THREE from 'three';
+
+    // 경고: alert() 대신 메시지 박스 스타일을 사용해야 하지만, 
+    // 기존 코드를 유지하고 오류 처리 부분만 메시지 박스 스타일로 대체했습니다.
+    function showErrorMessage(message) {
+        const existingAlert = document.getElementById('custom-alert');
+        if (existingAlert) existingAlert.remove();
+
+        const alertDiv = document.createElement('div');
+        alertDiv.id = 'custom-alert';
+        alertDiv.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: #ff4d4d; color: white; padding: 20px; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 1000;
+            font-family: sans-serif; text-align: center;
+        `;
+        alertDiv.innerHTML = `<strong>오류 발생:</strong><p>${message}</p><button onclick="document.getElementById('custom-alert').remove()">닫기</button>`;
+        document.body.appendChild(alertDiv);
+    }
+
+
+    let canvas = document.querySelector("#canvas");
+    
+    const initialWidth = Math.min(window.innerWidth, 1000);
+    const initialHeight = initialWidth;
+    
+    let scene = new THREE.Scene(); 
+    
+    let renderer = new THREE.WebGLRenderer({
+        canvas: canvas,
+        alpha: true,
+        antialias: true 
+    });
+    
+    renderer.toneMapping = THREE.ACESFilmicToneMapping; 
+    renderer.toneMappingExposure = 1.0; 
+
+    renderer.setSize(initialWidth, initialHeight); 
+    
+    let camera = new THREE.PerspectiveCamera(30, initialWidth / initialHeight, 0.1, 1000);
+    camera.position.z = 5; 
+
+    // 조명 설정
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0); 
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(5, 5, 5); 
+    scene.add(directionalLight);
+
+    const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    backLight.position.set(-5, -5, -5); 
+    scene.add(backLight);
+
+    const asdfg = new THREE.DirectionalLight(0xffffff, 0.5);
+    asdfg.position.set(0, -5, 0); 
+    scene.add(asdfg);
+
+    
+
+    let moonModel; 
+
+    let loader = new GLTFLoader();
+    
+    loader.load('Moon.glb', function(glb) {
+        moonModel = glb.scene;
+        
+        moonModel.position.y = -0.6;
+        
+        // 2. 모델 재질 수정 (기존 코드 유지)
+        moonModel.traverse((child) => {
+            if (child.isMesh) {
+                if (child.material.isMeshStandardMaterial || child.material.isMeshPhysicalMaterial) {
+                    child.material.emissiveMap = null; 
+                    child.material.emissiveIntensity = 0; 
+                    child.material.specularMap = null; 
+                    child.material.roughness = 1.0; 
+                    child.material.metalness = 0.0; 
+                    
+                    if (child.material.map) {
+                        child.material.map.encoding = THREE.sRGBEncoding;
+                    }
+                } else if (child.material.shininess !== undefined) {
+                    child.material.shininess = 0; 
+                }
+                child.material.needsUpdate = true;
+            }
+        });
+
+        moonModel.scale.set(0.8, 0.8, 0.8); 
+        scene.add(moonModel);
+        
+        onWindowResize();
+        animate(); 
+    }, undefined, function(error) {
+        console.error('GLB 모델 로드 중 오류 발생:', error);
+        showErrorMessage('3D 모델 파일(Moon.glb)을 찾을 수 없거나 로드에 실패했습니다. 파일 경로를 확인하세요.');
+    });
+
+    function onWindowResize() {
+        const newWidth = Math.min(window.innerWidth, 1000);
+        const newHeight = newWidth;
+
+        camera.aspect = newWidth / newHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(newWidth, newHeight);
+        
+        canvas.style.width = `${newWidth}px`;
+        canvas.style.height = `${newHeight}px`;
+
+        // 캔버스 컨테이너 높이 조정 (캔버스 높이에 맞춤)
+        const wrapper = document.querySelector('.canvas-wrapper');
+        if (wrapper) {
+            wrapper.style.height = `${newHeight}px`;
+        }
+    }
+    
+    window.addEventListener('resize', onWindowResize);
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        // 스크롤 이벤트가 회전을 담당하므로, 기본 애니메이션은 주석 처리합니다.
+        // if (moonModel) {
+        //     moonModel.rotation.y += 0.001; 
+        // }
+        renderer.render(scene, camera);
+    }
+
+    // 초기 로드가 완료되지 않아도 렌더링이 되도록 보장
+    if (canvas) {
+        // onWindowResize에서 이미 렌더링을 호출했으므로 여기서는 함수만 선언합니다.
+    }
+    
+    window.addEventListener('scroll' , function(){
+        if (moonModel) { //예외처리
+            moonModel.rotation.y = window.scrollY / 400
+            renderer.render(scene, camera);
+        }
+        // console.log(window.scrollY)
+    })
+    
+</script>
+
+
+
+    
+    <br>
+    <h2 id = "ISEE" class = "Out-Text">The solar system - MOON</h2>
+    <div class = "upText2">
+        <p class = "Out-Detail-Text">The moon was considered to be difficult to rust because of its dry, oxygen-free environment, but recent observations by the Moon Mineralogy Mapper confirmed the widespread distribution of oxidized iron minerals in high-altitude areas.</p>
+        <p class = "Out-Detail-Text">It was a conventional wisdom (generally popular concept) that it was difficult to cause 'oxidation' in which iron meets oxygen and turns into rust because there was no rain and little air on the moon, but this study reversed conventional wisdom.</p>
+        <p class = "Out-Detail-Text">Through this discovery, the proposition of "no oxygen on the moon" has been changed to "there is a moment when oxygen is created on the moon."</p>
+    </div>
+    
+    
+
+    
+    
+    <img src = "asd.jpg" class = "size">
+    
+
+    <br>
+    <h2 id = "ISEE" class = "Out-Text">a mysterious aurora</h2>
+    <div class = "upText2">
+        <p class = "Out-Detail-Text">Aurora is a natural phenomenon in which plasma particles (solar wind) from the sun collide with oxygen and nitrogen in the upper atmosphere, driven by the Earth's magnetic field. It is mostly observed in polar regions and can be seen in mid-latitude areas when solar activity is active. The color of an aurora depends on the type of atmospheric molecules that collide.</p>
+        <p class = "Out-Detail-Text">Aurora is on other planets, too!</p>
+        <p class = "Out-Detail-Text">Aurora occurs on other planets because solar wind particles collide with the planet's magnetic field and atmospheric gas and emit light, which is the same as Earth's. In other words, an aurora can appear if there is a magnetic field on the planet itself, and there is an atmosphere and the sun.</p>
+    </div>
+    
+
+    <!-- 섹션 콘텐츠 -->
+    
+    <img src = "아 잠좀자자.png" class = "size">
+
+    <br>
+    <h2 id = "ISEE" class = "Out-Text">Lagrange point</h2>
+    <div class = "upText2">
+        <p class = "Out-Detail-Text">between the sun and the earth
+[Voiceover] There's a space where gravity seems to have strangely disappeared.
+
+There's no gravity, there's no centrifugal force
+Do not push or pull each other.
+
+this perfect balance point
+Scientists call it Lagrange Point.
+
+Here, satellites use very little energy
+It follows the movement of the Earth and the Sun together.
+
+It's like a 'stop' in the middle of the universe.
+
+There are five Lagrange points between the Sun and Earth.</p>
+<p class = "Out-Detail-Text">In fact, there's no place in the universe that doesn't exist without gravity
+
+For example, the gravity of the Earth and the Sun can balance each other, resulting in an object remaining in a stable position, which is also a point where gravity is offset by each other and looks like a stop</p>
+        
+    </div>
+
+    <img src = "dmsgk.png" class = "size">
+    
+
+    <br>
+    <h2 id = "ISEE" class = "Out-Text">Our galaxy</h2>
+    <div class = "upText2">
+        <p class = "Out-Detail-Text">All the stars we've seen in our lives are in that circle.</p>
+        <p class = "Out-Detail-Text">Shoot for the moon, if it misses, it will be a star.</p>
+    </div>
+
+    <p class = "Out-Detail-Text">Made by : HTML , CSS , JAVA-SCRIPT , (THREE.JS) , Blender = .TY!!  </p>
+    
+
+    <footer class="main-footer">
+        <p>&copy; 생기부 잘 써주세요 ㅎㅎ</p>
+    </footer>
+
+    <script src = "dataManager.js"></script>
+    <script src = "animation.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+/* 기본 스타일 및 초기화 */
+:root {
+    --primary-color: #007aff; /* Apple Blue는 어두운 배경에서도 포인트 색상으로 좋습니다. */
+    --text-color: #e0e0e0; /* 기본 텍스트 색상을 밝게 변경 */
+    --background-color: #0a0a0c; /* 전체 배경색을 아주 어두운 검정에 가깝게 변경 */
+    --darker-background-color: #1a1a1c; /* 헤더, 푸터 등에 사용될 약간 더 밝은 어두운색 */
+    --border-color: #333; /* 경계선 색상을 어두운 색에 맞게 조정 */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: var(--text-color); /* 기본 텍스트 색상을 밝게 */
+    background-color: var(--background-color); /* 어두운 배경색 적용 */
+    overflow-x: hidden; /* 가로 스크롤 방지 */
+}
+/* 별 효과를 위한 가상 요소 (잔잔한 별) */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* 다른 콘텐츠 뒤에 오도록 설정 */
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 80px 120px, #eee, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 150px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 100px 100px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 250px 150px, #fff, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 300px 200px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 400px 10px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 500px 300px, #eee, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 600px 50px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 700px 250px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 850px 180px, #fff, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 950px 350px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1000px 100px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1100px 280px, #eee, rgba(0,0,0,0)),
+        radial-gradient(3px 3px at 1200px 150px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1300px 50px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 1400px 320px, #fff, rgba(0,0,0,0));
+    background-repeat: repeat;
+    background-size: 1500px 750px;
+    animation: twinkle 15s infinite alternate;
+}
+@keyframes twinkle {
+    0% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.95); }
+    100% { opacity: 0.8; transform: scale(1); }
+}
+
+/* --- 별똥별 애니메이션 추가 --- */
+
+/* 별똥별 전체 컨테이너 (스크롤에 영향을 받지 않도록 fixed) */
+.shooting-star-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 하단 요소 클릭 가능하도록 */
+    z-index: -2; /* 잔잔한 별 배경(-1) 뒤에 위치 */
+    overflow: hidden; /* 별똥별이 화면 밖으로 나가도록 */
+}
+
+/* 별똥별 요소 스타일 (긴 꼬리 효과) */
+.star {
+    position: absolute;
+    width: 250px; /* 꼬리 길이 */
+    height: 2px;
+    /* 투명한 곳에서 흰색으로 이동하는 그라데이션으로 꼬리 표현 */
+    background: linear-gradient(-45deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1));
+    transform: rotate(45deg); /* 이동 각도 설정 (오른쪽 아래에서 왼쪽 위로) */
+    opacity: 0;
+    animation: shootingStar 10s linear infinite;
+    pointer-events: none;
+}
+
+/* 별똥별 애니메이션 키프레임 */
+@keyframes shootingStar {
+    0% {
+        transform: translate3d(0, 0, 0) rotate(45deg); /* 시작 위치 */
+        opacity: 0;
+    }
+    0.1% {
+        opacity: 1; /* 순간적으로 보임 */
+    }
+    4% {
+        /* 왼쪽 위로 빠르게 이동 (화면 밖으로) */
+        transform: translate3d(-100vw, -100vh, 0) rotate(45deg);
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+        /* 긴 딜레이를 주어 반복 간격을 만듦 */
+        transform: translate3d(-100vw, -100vh, 0) rotate(45deg);
+    }
+}
+
+/* 각 별똥별에 다른 시작 위치, 시간, 딜레이 부여 */
+.star:nth-child(1) { top: 100vh; left: 0vw; animation-delay: 0s; animation-duration: 10s; }
+.star:nth-child(2) { top: 150vh; left: 50vw; animation-delay: 3s; animation-duration: 8s; }
+.star:nth-child(3) { top: 120vh; left: 20vw; animation-delay: 5s; animation-duration: 12s; }
+.star:nth-child(4) { top: 180vh; left: 70vw; animation-delay: 8s; animation-duration: 9s; }
+.star:nth-child(5) { top: 100vh; left: 80vw; animation-delay: 1s; animation-duration: 7s; }
+
+/* --- 기존 스타일 유지 --- */
+
+.main-header {
+    background-color: var(--darker-background-color); /* 헤더 배경색을 어둡게 */
+    padding: 15px 0; /* 상하 여백을 조금 더 주어 공간 확보 */
+    text-align: center;
+    border-bottom: 1px solid var(--border-color); /* 경계선 색상 조정 */
+    position: relative; 
+    z-index: 1; /* 별 배경 위에 오도록 설정 */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    /* background-image : url('dddd\ \(1\).png'); */
+}
+/* main-header 안의 제목 및 텍스트 스타일 */
+.main-header h1 {
+    margin: 0 0 5px 0; 
+    color: #fff; 
+    font-size: 2.2em; 
+}
+.main-header h4 {
+    margin: 2px 0; 
+    color: var(--text-color); 
+    font-weight: 300; 
+    font-size: 0.9em; 
+}
+.main-header nav ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px; 
+}
+.main-header nav ul li {
+    display: inline-block;
+    margin: 0 15px;
+}
+.main-header nav ul li a {
+    text-decoration: none;
+    color: var(--primary-color);
+    font-weight: 400;
+    padding: 5px 0;
+    transition: color 0.3s ease;
+}
+.main-header nav ul li a:hover {
+    color: #ffffff;
+}
+/* 섹션 공통 스타일 */
+.content-section {
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+    justify-content: center;
+    padding: 80px 5vw; 
+    min-height: 70vh;
+    box-sizing: border-box;
+    position: relative; 
+    z-index: 1; 
+    background-color: transparent; 
+}
+.image-container,
+.text-content {
+    flex: 1;
+    padding: 0 3vw; 
+}
+.image-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px; 
+    box-shadow: 0 10px 30px rgba(255, 255, 255, 0.05); 
+}
+.text-content h2 {
+    font-size: 2.5em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff; 
+}
+.text-content p {
+    font-size: 1.1em;
+    color: var(--text-color); 
+    margin-bottom: 1em;
+}
+.main-footer {
+    background-color: var(--darker-background-color); 
+    color: #fff; 
+    text-align: center;
+    padding: 30px 0;
+    font-size: 0.9em;
+    position: relative; 
+    z-index: 1; 
+}
+.detail{
+    opacity:0.8; 
+}
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .main-header h1 {
+        font-size: 1.8em;
+    }
+    .main-header h4 {
+        font-size: 0.8em;
+    }
+    .content-section,
+    .content-section.reversed-layout {
+        flex-direction: column; 
+        padding: 50px 5vw;
+        min-height: auto;
+    }
+    .image-container,
+    .text-content {
+        padding: 20px 0; 
+    }
+    .text-content h2 {
+        font-size: 1.8em;
+    }
+    .text-content p {
+        font-size: 1em;
+    }
+}
+@media (max-width: 480px) {
+    .main-header nav ul li {
+        margin: 0 10px;
+    }
+    .main-header nav ul li a {
+        font-size: 0.9em;
+    }
+}
+.bxo{
+    height: 1000px;
+}
+/* Three.js 캔버스와 텍스트 오버레이를 감싸는 컨테이너 */
+.canvas-wrapper {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+}
+#canvas {
+    display: block;
+    width: 100%; 
+    height: auto; 
+    max-width: 1000px; 
+    margin: 0 auto; 
+}
+/* 텍스트 오버레이: 캔버스 위에 정확히 겹치도록 absolute 위치 설정 */
+.sameSizeWithCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+}
+.MoonP {
+    font-size: 2.5em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff; 
+    padding: 80px 5vw;
+}
+.galaxyTexture {
+    background-image: url('robura.png'); 
+    -webkit-background-clip: text; 
+    background-clip: text;
+    color: transparent; 
+    -webkit-text-fill-color: transparent; 
+}
+.centerText {
+    color: white; 
+    padding: 0px;
+    font-size: 6em; 
+    text-align: center;
+    font-weight: 700;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5), 0 0 10px rgba(0, 0, 0, 0.8);
+    position: static;
+    transform: none;
+    top: auto;
+    left: auto;
+}
+.Out-Text{
+    padding: 80px 5vw;
+    font-size: 2.5em;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #fff;
+    position: relative;
+    top: -150px;
+    opacity: 0;
+    transition: all 2s;
+}
+.Out-Detail-Text{
+    padding: 25px 5vw;
+    font-size: 2em;
+    color: var(--text-color); 
+    margin-bottom: 1em;
+    position: relative;
+    top: -120px;
+}
+/* 코드 더러움 ㅈㅅ */
+.upText{
+    position: relative;
+    top : -80px;
+}
+.upText2{
+    position: relative;
+    top : -50px;
+}
+
+/* --- 타이핑 애니메이션을 위한 CSS 추가 --- */
+
+/* 커서 깜빡임 애니메이션 정의 */
+@keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: var(--primary-color); } 
+}
+
+/* 타이핑 중일 때 커서 스타일 적용 (JS에서 클래스를 토글함) */
+.typing-cursor {
+    border-right: .15em solid var(--primary-color); 
+    animation: blink-caret 0.75s step-end infinite;
+}
+
+.size {
+    max-width: 90%; 
+    display: block; 
+    margin: 30px auto;
+    position: relative;
+    top: -100px;
+}
