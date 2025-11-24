@@ -120,7 +120,7 @@ body::before {
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
-    /* background-image : url('dddd\ \(1\).png'); */
+    background-image : url('dddd\ \(1\).png');
 }
 /* main-header 안의 제목 및 텍스트 스타일 */
 .main-header h1 {
@@ -339,4 +339,10 @@ body::before {
     margin: 30px auto;
     position: relative;
     top: -100px;
+}
+
+.idk{
+    height: 100vw;
+    width: 100vw;
+    z-index: 2;
 }
